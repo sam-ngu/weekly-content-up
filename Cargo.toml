@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 walkdir = "2"
 dotenvy = "0.15.1"
+confy = "0.4"

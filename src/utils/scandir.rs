@@ -4,8 +4,13 @@ fn is_hidden_folder(folder_name: &String) -> bool{
   folder_name.starts_with(".")
 }
 
+
+
 pub fn scan(dir_path: &String) -> Result<(), std::io::Error> {
-    let directories = WalkDir::new(dir_path).follow_links(true).into_iter();
+    // let directories = WalkDir::new(dir_path)
+    //                                     .follow_links(true)
+    //                                     .into_iter()
+    //                                     .filter_entry()
 
 
     for entry in WalkDir::new(dir_path)

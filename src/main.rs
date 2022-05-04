@@ -1,13 +1,20 @@
 mod utils;
+mod uploader;
+mod config;
+
 use dotenvy::dotenv;
 use utils::scandir;
+use uploader::files_filter;
 
 
 fn main() {
     dotenv().ok();
+    
+    files_filter::get_unsolved(String::from("1"));
 
-    let dir_path = String::from(".");
-    let result = scandir::scan(&dir_path);
+    // let dir_path = String::from(".");
+    // let result = scandir::scan(&dir_path);
+
 
 
     // TODO: parse args
@@ -29,5 +36,5 @@ fn main() {
     // and push
 
 
-    println!("Hello, world!");
+    
 }
