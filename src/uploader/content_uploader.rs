@@ -20,7 +20,7 @@ fn get_class_content_path() -> String {
 }
 
 fn get_week_folder_path(week_num: &String) -> String {
-    let week_num = get_week_num(week_num.to_owned());
+    let week_num = get_week_num(week_num);
     let class_content_path = get_class_content_path();
 
     // find the weekfolder
@@ -86,13 +86,13 @@ fn for_each_solved_folder_from(folder: &String, iteratee: impl Fn(DirEntry)) {
             }
         });
 }
-fn get_week_num(week_num: String) -> String {
+fn get_week_num(week_num: &String) -> String {
     if week_num.len() == 1 {
         return format!("0{}", week_num);
     }
-    week_num
+    format!("{}", week_num)
 }
-pub fn copy_week_content(week_num: String, to: &String) {
+pub fn copy_week_content(week_num: &String, to: &String) {
     let week_num = get_week_num(week_num);
 
     let week_folder_path = get_week_folder_path(&week_num);
@@ -117,7 +117,7 @@ pub fn remove_solved_from(folder: &String) {
 pub fn add_solved_to(week_num: &String, dest_folder: &String) {
     // dest_folder is "/home/sam/Development/trilogy/WAUS-VIRT-FSF-PT-05-2022-U-LOLC"
 
-    let week_num = get_week_num(week_num.to_owned());
+    let week_num = get_week_num(week_num);
 
     let src_week_folder = format!("{}", get_week_folder_path(&week_num.to_owned()));
     let src_week_activities_folder = format!("{}/01-Activities", src_week_folder);
@@ -143,7 +143,7 @@ pub fn add_solved_to(week_num: &String, dest_folder: &String) {
 pub fn add_homework_to(week_num: &String, dest: &String){
 
     // get week folder
-    let week_num = get_week_num(week_num.to_owned());
+    let week_num = get_week_num(week_num);
 
     let src_week_folder = format!("{}", get_week_folder_path(&week_num.to_owned()));
 
