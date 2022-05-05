@@ -4,20 +4,25 @@ mod config;
 
 use dotenvy::dotenv;
 use utils::scandir;
-use uploader::files_filter;
+use uploader::{content_uploader, gitlab};
 
 
 fn main() {
     dotenv().ok();
     
-    files_filter::copy_week_content(String::from("1"));
     let week_num = String::from("1");
     let dest = String::from("/home/sam/Development/trilogy/WAUS-VIRT-FSF-PT-05-2022-U-LOLC");
-    files_filter::remove_solved_from(&week_num,&dest);
+    
+    // content_uploader::copy_week_content(week_num, &dest);
+    // content_uploader::remove_solved_from(&dest);
     // files_filter::add_solved_to(&week_num, &dest);
 
-    // let dir_path = String::from(".");
-    // let result = scandir::scan(&dir_path);
+
+    // content_uploader::add_homework_to(&week_num, &dest);
+    
+
+    gitlab::commit("testing2");
+    gitlab::push();
 
 
 

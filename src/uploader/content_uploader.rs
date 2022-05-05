@@ -1,13 +1,14 @@
-use crate::config::app::AppConfig;
+use crate::config::app_config::{AppConfig, self};
 use fs_extra::{self, dir::CopyOptions};
 use std::{
     fs::{self, create_dir_all},
-    path::Path,
+    path::Path, fmt::format,
 };
 use walkdir::{DirEntry, WalkDir};
 
 fn src_folder() -> String {
-    String::from("/home/sam/Development/trilogy/bootcampsrc-uwa")
+    let config = app_config::AppConfig::new();
+    String::from(config.src_path)
 }
 
 fn target_folder() -> String {
@@ -79,7 +80,8 @@ fn for_each_solved_folder_from(folder: &String, iteratee: impl Fn(DirEntry)) {
         .into_iter()
         .for_each(|res| {
             let entry = res.expect("folder not found?");
-            if entry.path().is_dir() && entry.path().ends_with("Solved") {
+            let is_solved = entry.path().ends_with("Solved") || entry.path().ends_with("Main");
+            if entry.path().is_dir() && is_solved {
                 iteratee(entry);
             }
         });
@@ -90,7 +92,7 @@ fn get_week_num(week_num: String) -> String {
     }
     week_num
 }
-pub fn copy_week_content(week_num: String) {
+pub fn copy_week_content(week_num: String, to: &String) {
     let week_num = get_week_num(week_num);
 
     let week_folder_path = get_week_folder_path(&week_num);
@@ -98,20 +100,13 @@ pub fn copy_week_content(week_num: String) {
     let week_title = get_week_name_from_path(&week_folder_path);
 
     let src_activities = format!("{}/01-Activities", String::from(week_folder_path));
-    let dest_activities = format!("{}/{}", String::from(target_folder()), week_title);
+    let dest_activities = format!("{}/{}", String::from(to), week_title);
 
     // copy the activities
-    println!("{}", src_activities);
-    println!("{}", dest_activities);
-
     copy_files(&src_activities, &dest_activities);
 }
 
-pub fn remove_solved_from(week_num: &String, folder: &String) {
-    let week_folder = get_week_title(week_num);
-    println!("week num: {}", week_num);
-    println!("week folder: {}", week_folder);
-
+pub fn remove_solved_from(folder: &String) {
     for_each_solved_folder_from(folder, |entry| {
         let result = fs::remove_dir_all(entry.path());
         println!("Deleting {:?}", entry.path());
@@ -124,19 +119,18 @@ pub fn add_solved_to(week_num: &String, dest_folder: &String) {
 
     let week_num = get_week_num(week_num.to_owned());
 
-    let src_week_folder = get_week_folder_path(&week_num.to_owned());
+    let src_week_folder = format!("{}", get_week_folder_path(&week_num.to_owned()));
+    let src_week_activities_folder = format!("{}/01-Activities", src_week_folder);
+
     let week_title = get_week_name_from_path(&src_week_folder);
 
-    let dest_folder_path = Path::new(dest_folder);
-
-    for_each_solved_folder_from(&src_week_folder, |entry| {
+    for_each_solved_folder_from(&src_week_activities_folder, |entry| {
         let solved_path = String::from(entry.path().to_string_lossy());
         println!("{:?}", solved_path);
 
         let splitted: Vec<&str> = solved_path.split("/").collect();
         let activity_name = splitted[splitted.len() - 2];
         
-
         let copy_to = format!("{}/{}/01-Activities/{}", dest_folder, week_title, activity_name);
         println!("copy to: {}", copy_to);
         let from = String::from(entry.path().to_string_lossy());
@@ -144,3 +138,25 @@ pub fn add_solved_to(week_num: &String, dest_folder: &String) {
         copy_files(&from, &copy_to);
     });
 }
+
+
+pub fn add_homework_to(week_num: &String, dest: &String){
+
+    // get week folder
+    let week_num = get_week_num(week_num.to_owned());
+
+    let src_week_folder = format!("{}", get_week_folder_path(&week_num.to_owned()));
+
+
+    let week_title = get_week_name_from_path(&src_week_folder);
+
+    let homework_src = format!("{}/02-Challenge",src_week_folder);
+    let copy_to = format!("{}/{}", dest, week_title);
+
+    copy_files(&homework_src, &copy_to);
+    remove_solved_from(&copy_to);
+
+
+}
+
+
