@@ -10,7 +10,9 @@ use uploader::files_filter;
 fn main() {
     dotenv().ok();
     
-    files_filter::get_unsolved(String::from("1"));
+    // files_filter::get_unsolved(String::from("1"));
+    let dest = String::from("/home/sam/Development/trilogy/WAUS-VIRT-FSF-PT-05-2022-U-LOLC/01-HTML-Git-CSS");
+    files_filter::remove_solved_from(&dest);
 
     // let dir_path = String::from(".");
     // let result = scandir::scan(&dir_path);
