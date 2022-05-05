@@ -2,7 +2,9 @@ mod utils;
 mod uploader;
 mod config;
 
+use config::app_config::AppConfig;
 use dotenvy::dotenv;
+use inquire::{Text, validator::StringValidator, Select};
 use utils::scandir;
 use uploader::{content_uploader, gitlab};
 
@@ -10,23 +12,50 @@ use uploader::{content_uploader, gitlab};
 fn main() {
     dotenv().ok();
     
-    let week_num = String::from("1");
-    let dest = String::from("/home/sam/Development/trilogy/WAUS-VIRT-FSF-PT-05-2022-U-LOLC");
+    let app_config = AppConfig::new();
+
+    let dest = String::from(app_config.class_repo_path);
     
-    content_uploader::copy_week_content(&week_num, &dest);
-    content_uploader::remove_solved_from(&dest);
-    content_uploader::add_homework_to(&week_num, &dest);
+    
 
     // content_uploader::add_solved_to(&week_num, &dest);
     
 
 
+    // which week to upload?
+    let numeric_string_validator: StringValidator = &|input| {
+        if input.parse::<f64>().is_ok(){
+            Ok(())
+        }else{
+            Err("Only numerical week is allowed!".to_string())
+        }
+    };
+    let week_num = Text::new("Which week do you want to upload?")
+        .with_validator(numeric_string_validator)
+        .prompt()
+        .expect("can't get input");
+
+
+    // Upload solved or unsolved?
+    let options = vec!["solved", "unsolved"];
+    let upload_type = Select::new("Upload solved or unsolved?", options)
+        .prompt().expect("cannot ask selection");
+
+
+    println!("{}", week_num);
     
 
-    // gitlab::commit("testing2");
-    // gitlab::push();
+    if upload_type == "solved"{
+        content_uploader::add_solved_to(&week_num, &dest);
+    }else {
+        content_uploader::copy_week_content(&week_num, &dest);
+        content_uploader::remove_solved_from(&dest);
+        content_uploader::add_homework_to(&week_num, &dest);
+    }
 
-
+    let commit_msg = format!("added week {} {}", week_num, upload_type);
+    gitlab::commit(&commit_msg);  
+    gitlab::push();
 
     // TODO: parse args
 

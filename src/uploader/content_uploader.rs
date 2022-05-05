@@ -99,11 +99,22 @@ pub fn copy_week_content(week_num: &String, to: &String) {
 
     let week_title = get_week_name_from_path(&week_folder_path);
 
-    let src_activities = format!("{}/01-Activities", String::from(week_folder_path));
+    let src_activities = format!("{}/01-Activities", String::from(&week_folder_path));
     let dest_activities = format!("{}/{}", String::from(to), week_title);
+
+    let src_algo = format!("{}/03-Algorithms", String::from(&week_folder_path));
+    let src_algo_path = Path::new(&src_algo);
+
 
     // copy the activities
     copy_files(&src_activities, &dest_activities);
+
+    // copy algorithms if exists
+    if src_algo_path.exists() {
+        let dest_algo = format!("{}/{}", String::from(to), week_title);
+        copy_files(&src_algo, &dest_algo);
+    }
+    
 }
 
 pub fn remove_solved_from(folder: &String) {
