@@ -4,7 +4,7 @@ mod config;
 
 use config::app_config::AppConfig;
 use dotenvy::dotenv;
-use inquire::{Text, validator::StringValidator, Select};
+use inquire::{Text, validator::StringValidator, Select, Confirm};
 use utils::scandir;
 use uploader::{content_uploader, gitlab};
 
@@ -41,6 +41,8 @@ fn main() {
     let upload_type = Select::new("Upload solved or unsolved?", options)
         .prompt().expect("cannot ask selection");
 
+    let push_now = Confirm::new("Push to gitlab?").prompt().expect("cannot ask gitlab");
+
 
     println!("{}", week_num);
     
@@ -54,27 +56,10 @@ fn main() {
     }
 
     let commit_msg = format!("added week {} {}", week_num, upload_type);
-    gitlab::commit(&commit_msg);  
-    gitlab::push();
-
-    // TODO: parse args
-
-    // expected args
-    // 1. week num
-    // 2. solved or unsolved
-
-    // check if wanted solved or unsolved
-
-    // if unsolved
-    // copy all unsolved to gitlab repo
-
-    // and push
-
-    // if solved
-    // copy all solved to gitlab repo
-
-    // and push
 
 
-    
+    if push_now {
+        gitlab::commit(&commit_msg);  
+        gitlab::push();
+    }
 }
