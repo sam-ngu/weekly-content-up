@@ -51,12 +51,16 @@ fn main() {
         content_uploader::add_solved_to(&week_num, &dest);
     }else {
         content_uploader::copy_week_content(&week_num, &dest);
-        content_uploader::remove_solved_from(&dest);
+        
+        let week_name = content_uploader::get_week_title(&week_num);
+
+        let dest_week_folder = format!("{}/{}", dest, week_name);
+        content_uploader::remove_solved_from(&dest_week_folder);
+
         content_uploader::add_homework_to(&week_num, &dest);
     }
 
     let commit_msg = format!("added week {} {}", week_num, upload_type);
-
 
     if push_now {
         gitlab::commit(&commit_msg);  

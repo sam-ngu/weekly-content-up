@@ -51,7 +51,7 @@ fn get_week_name_from_path(week_folder_path: &String) -> String {
         .to_string()
 }
 
-fn get_week_title(week_num: &String) -> String {
+pub fn get_week_title(week_num: &String) -> String {
     let week_folder_path = get_week_folder_path(week_num);
     get_week_name_from_path(&week_folder_path)
 }
@@ -114,6 +114,7 @@ pub fn copy_week_content(week_num: &String, to: &String) {
         let dest_algo = format!("{}/{}", String::from(to), week_title);
         copy_files(&src_algo, &dest_algo);
     }
+    
     
 }
 
